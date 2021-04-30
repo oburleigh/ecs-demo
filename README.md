@@ -4,7 +4,7 @@ The primary output from this demo is a single instance (this can be increased ch
 
 Here we use [Fargate](https://aws.amazon.com/fargate) which is a serverless compute engine but I have not added the load balancer as I do not want to incur additional costs.
 
-**Note** - Any Amazon ECS service using the Fargate launch type is end for CloudWatch CPU and memory utilization metrics automatically and fine tuning these metrics will enable autoscaling. The capability to fine tune will be added to this codebase but curently the default scaling will be used.
+**Note** - Any Amazon ECS service using the Fargate launch type is enabled for CloudWatch CPU and memory utilization metrics automatically and fine tuning these metrics will enable autoscaling. The capability to fine tune will be added to this codebase but curently the default scaling will be used.
 
 - Creation of Core Network - VPC, IGW, Route Tables (RT), Routes, RT Association and Subnets
 - Creation of [Elastic Container Registry](https://aws.amazon.com/ecr/)
