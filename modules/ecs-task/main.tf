@@ -19,6 +19,12 @@ resource "aws_ecs_task_definition" "default" {
       image = var.image
       cpu = var.container_cpu
       memory = var.container_memory
+      portMappings = [
+        {
+        containerPort = 80
+        protocol = "tcp"
+        }
+      ]
     }
   ])
   

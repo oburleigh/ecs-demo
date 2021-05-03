@@ -1,15 +1,22 @@
 # Introduction
 
-The primary output from this demo is a single instance (can be increased changing the Desired Count see Usage) container running a publically avialable web page powered by NGINX. Although you can use your own Dockerfile that will be used as input to the build, push and provision. 
+The primary output from this demo is to initially deploy a two web servers powered by NGINX via an Application Load Balancer, scaling to multiple instances based on auto scaling policies. The demo uses Target Tracking scaling policies to simplify the creation of auto scaling but after refactoring the module structure in future it will allow more flexibility in providing Step Scaling policies as well, which provides more granularity and control to the user.
 
-I'm using [Fargate](https://aws.amazon.com/fargate) which is a serverless compute engine but I have not added the load balancer as I do not want to incur additional costs.
+You can use your own Dockerfile that will be used as input to the build, push and provision. 
 
-- Creation of Core Network - VPC, IGW, Route Tables (RT), Routes, RT Association and Subnets
+I'm using [Fargate](https://aws.amazon.com/fargate) which is a serverless compute engine.
+
+In my case the instances only used a NAT Gateway in order to pull Docker images from ECR and therefore I moved to a more optimal approach using [VPC Endpoints](https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html) removing the additional complexity and cost of a NAT Gateway.
+
+- Creation of Core Network - ALB, VPC, VPC Endpoints, Internet GW, Route Tables (RT), Routes, RT Association and Subnets
+- Creation of Security - Security Groups, IAM Policies
 - Creation of [Elastic Container Registry](https://aws.amazon.com/ecr/)
 - Image build and push to ECR 
 - Creation of [Elastic Container Service](https://aws.amazon.com/ecs/) Cluster 
-- Creation of [ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html)
-- Creation of [ECS Task](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html) 
+- Creation of [ECS Task](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
+- Creation of [ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html) 
+
+![High Level Architecture](demo_architecture.svg)
 
 ## Pre-requisites
 
@@ -38,9 +45,22 @@ aws ecr get-login-password --region "$region" | docker login --username AWS --pa
 
 ## Usage
 
-This is not meant to be overly complex. 
-
 Navigate to the cloned repository locally on your device. A *webapp.tfvars* file has been provided as a base to update/amend values as you please. No data held in this [tfvars](https://www.terraform.io/docs/language/values/variables.html) file is sensitive but always exercise caution when storing these types of files on public reposititories as sensitive values can be present even by accident.
+
+A few entries you may want to change:
+
+**ecs_service_desired_count:** when you provision your service, you can state how many tasks to create from the beginning. Note: once the service is deployed, Terraform will no longer track any changes to *Desired Count* given that the count will likely change through scaling and therefore a [Lifecycle Block](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html) exists in the code.
+
+**ecr_build_path:** a relative path to your image
+**ecr_image:** a name for your image
+**ecr_image_tag:** a tag for said image
+
+**aws_appautoscaling_target_min_capacity:** The target minimum tasks for your service
+**aws_appautoscaling_target_max_capacity:** The target maximum tasks for your service
+**target_policy_mem_target_value:** A value for the percentage target for memory usage
+**target_policy_cpu_target_value:** A value for the percentage target for cpu usage
+
+Outside of these values you can scale manually in the ECS Service UI
 
 Once happy with the inputs, you may execute
 
@@ -72,7 +92,8 @@ Note when you [Terraform Destroy](https://www.terraform.io/docs/cli/commands/des
 
 ## In Progress
 
-- [] Add ALB functionality
+- [x] Add ALB functionality
+- [x] Replace NAT GW with VPC Endpoints
 - [] Move state to S3 with Dynamo providing the locking
 - [] Add switch functionality to turn on/off certain modules
 - [] Move modules to own repositories
@@ -84,8 +105,6 @@ Note when you [Terraform Destroy](https://www.terraform.io/docs/cli/commands/des
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

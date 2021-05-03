@@ -13,7 +13,6 @@ variable "security_groups" {
 }
 
 variable "subnets" {
-  type = list(string)
   description = "List of subnets to attach to the service"
 }
 
@@ -42,3 +41,29 @@ variable "assign_public_ip" {
   description = "Assign a public IP to this service"
 }
 
+variable "target_group_arn" {
+  type = string
+  description = "update"
+}
+
+variable "container_name" {
+  type = string
+  description = "update"
+}
+
+variable "container_port" {
+  type = number
+  description = "update"
+}
+
+variable "load_balancer_container_port" {
+  default     = 80
+  type        = number
+  description = "how many instances to attrain to"
+}
+
+variable "load_balancer_container_name" {
+  default     = "webapp"
+  type        = string
+  description = "how many instances to attrain to"
+}

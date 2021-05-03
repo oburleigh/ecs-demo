@@ -12,11 +12,22 @@ variable "vpc_cidr_block" {
 
 variable "public_subnet_cidr_block" {
   type        = string
+  description = "CIDR for the Public Subnet"
+}
+
+variable "private_subnet_cidr_block" {
+  type        = string
   description = "CIDR for the Private Subnet"
 }
 
 variable "map_public_ip_on_launch" {
   default     = true
+  type        = bool
+  description = "Subnet to be mapped to Public IP"
+}
+
+variable "map_public_ip_on_launch_private" {
+  default     = false
   type        = bool
   description = "Subnet to be mapped to Public IP"
 }
@@ -77,6 +88,18 @@ variable "ecs_service_desired_count" {
   description = "how many instances to attrain to"
 }
 
+variable "load_balancer_container_port" {
+  default     = 80
+  type        = number
+  description = "how many instances to attrain to"
+}
+
+variable "load_balancer_container_name" {
+  default     = "webapp"
+  type        = string
+  description = "how many instances to attrain to"
+}
+
 variable "ecs_service_assign_pub_ip" {
   default     = true
   type        = bool
@@ -127,4 +150,26 @@ variable "ecs_task_container_cpu" {
 variable "ecs_task_name" {
   type        = string
   description = "name of task"
+}
+
+#=========================================Auto Scaling Variables
+
+variable "aws_appautoscaling_target_min_capacity" {
+  type        = number
+  description = "The min capacity of the scalable target."
+}
+
+variable "aws_appautoscaling_target_max_capacity" {
+  type        = number
+  description = "The max capacity of the scalable target."
+}
+
+variable "target_policy_mem_target_value" {
+  type        = number
+  description = "The target value for the memory metric"
+}
+
+variable "target_policy_cpu_target_value" {
+  type        = number
+  description = "The target value for the CPU metric"
 }
